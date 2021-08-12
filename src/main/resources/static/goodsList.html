@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品列表</title>
+    <!-- jquery -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css"/>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <!-- layer -->
+    <script type="text/javascript" src="layer/layer.js"></script>
+    <!-- common.js -->
+    <script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+<div class="panel panel-default">
+    <div class="panel-heading">秒杀商品列表</div>
+    <table class="table" id="goods-list">
+    </table>
+</div>
+</body>
+
+<script>
+
+    $(function () {
+       getGoodsList();
+    });
+
+    function getGoodsList() {
+        $.ajax({
+            url: '/goods/list',
+            type: 'get',
+            success: function (data) {
+                if (data.code === 200) {
+                    render(data.obj)
+                } else {
+                    layer.msg(data.message)
+                }
+            },
+            error: function (data) {
+                layer.msg("客户端请求错误")
+            }
+        })
+    }
+
+    // <tr id="goods">
+    //     <td id="goodsName"></td>
+    //     <td>
+    //        <img id="goodsImg" width="100" height="100"/>
+    //     </td>
+    //     <td id="goodsPrice"></td>
+    //     <td id="seckillPrice"></td>
+    //     <td id="stockCount"></td>
+    //     <td>
+    //     <a >详情</a>
+    //     </td>
+    // </tr>
+
+    function render(goodsList) {
+        var html = '<tr>\n' +
+            '            <td>商品名称</td>\n' +
+            '            <td>商品图片</td>\n' +
+            '            <td>商品原价</td>\n' +
+            '            <td>秒杀价</td>\n' +
+            '            <td>库存数量</td>\n' +
+            '            <td>详情</td>\n' +
+            '        </tr>';
+
+        for (let i = 0; i < goodsList.length; i++) {
+            const goods = goodsList[i];
+            const goodsId = goods.id;
+            const goodsName = goods.goodsName;
+            const goodsImg = goods.goodsImg;
+            const goodsPrice = goods.goodsPrice;
+            const seckillPrice = goods.seckillPrice;
+            const stockCount = goods.stockCount;
+            const goodsDetail = goods.goodsDetail;
+            var str = '<tr>\n' +
+                '            <td>'+ goodsName +'</td>\n' +
+                '            <td>'+ '<img src="' + goodsImg + '" alt="" width="100" height="100">' +'</td>\n' +
+                '            <td>'+ goodsPrice +'</td>\n' +
+                '            <td>'+ seckillPrice +'</td>\n' +
+                '            <td>' + stockCount +'</td>\n' +
+                '            <td>'+ goodsDetail +'</td>\n' +
+                '            <td>'+ '<a href="goodsDetail.html?goodsId=' + goodsId +'">详情<a/>' +'</td>\n' +
+                '     </tr>';
+            html += str;
+        }
+        $("#goods-list").html(html)
+    }
+
+</script>
+</html>
