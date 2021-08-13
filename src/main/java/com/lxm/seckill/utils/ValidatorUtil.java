@@ -7,10 +7,6 @@ import java.util.regex.Pattern;
 
 /**
  * 手机号码校验
- * 乐字节：专注线上IT培训
- * 答疑老师微信：lezijie
- *
- * @author zhoubin
  * @since 1.0.0
  */
 public class ValidatorUtil {

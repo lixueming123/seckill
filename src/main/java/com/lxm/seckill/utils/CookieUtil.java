@@ -13,8 +13,6 @@ import java.net.URLEncoder;
 /**
  * Cookie工具类
  *
- * @author zhoubin
- * @since 1.0.0
  */
 public final class CookieUtil {
 
