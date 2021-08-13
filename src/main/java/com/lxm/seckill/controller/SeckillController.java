@@ -50,8 +50,8 @@ public class SeckillController implements InitializingBean {
     public static ConcurrentHashMap<Long, Boolean> emptyStock = new ConcurrentHashMap<>();
 
 
-    @Deprecated
     //@PostMapping
+    @Deprecated
     public String seckill(Long goodsId, User user, Model model) {
 
         model.addAttribute("user", user);
@@ -92,7 +92,8 @@ public class SeckillController implements InitializingBean {
      * @param user    用户
      * @return RespBean
      */
-    //    @PostMapping("")
+    @PostMapping("/test")
+    @AccessLimit
     public RespBean seckill(@RequestParam("goodsId") Long goodsId,
                             User user) {
         // 内存标记判断库存

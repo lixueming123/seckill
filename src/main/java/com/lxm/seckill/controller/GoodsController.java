@@ -53,7 +53,6 @@ public class GoodsController {
      *     加缓存优化后  2800
      * (linux) 290
      */
-    
 //    @GetMapping(value = "/list")
 //    @AccessLimit
     @Deprecated
@@ -95,6 +94,7 @@ public class GoodsController {
      */
     // @GetMapping(value = "/detail/{goodsId}/deprecated")
     @Deprecated
+    @AccessLimit
     public String detail(Model model, User user, @PathVariable Long goodsId,
                          HttpServletRequest req, HttpServletResponse resp) {
 

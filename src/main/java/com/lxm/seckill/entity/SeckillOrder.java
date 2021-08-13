@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,6 +29,7 @@ public class SeckillOrder implements Serializable {
      * 秒杀订单ID
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
@@ -36,6 +40,7 @@ public class SeckillOrder implements Serializable {
     /**
      * 订单ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long orderId;
 
     /**
