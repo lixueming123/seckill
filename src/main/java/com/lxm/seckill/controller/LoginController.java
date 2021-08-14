@@ -31,7 +31,7 @@ public class LoginController {
 
     /**
      * 登录功能
-     * @param loginVo
+     * @param loginVo LOGIN_DTO
      */
     @PostMapping("/doLogin")
     @ResponseBody

@@ -44,7 +44,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
             AccessLimit annotation = handlerMethod.getMethodAnnotation(AccessLimit.class);
 
             if (annotation == null) {
-                return true;
+                return  true;
             }
 
             boolean needLogin = annotation.needLogin();
@@ -76,6 +76,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
         }
         return true;
     }
+
 
     public void writeError(HttpServletResponse response, RespBeanEnum errorEnum) throws IOException {
         response.setContentType("application/json");

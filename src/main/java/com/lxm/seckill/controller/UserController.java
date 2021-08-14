@@ -55,8 +55,8 @@ public class UserController {
 
     /**
      * 创建10000个测试用户
-     * @return
-     * @throws IOException
+     * @return user list
+     * @throws IOException io ex
      */
     @GetMapping("/create")
     public List<User> generateUserFile() throws IOException {

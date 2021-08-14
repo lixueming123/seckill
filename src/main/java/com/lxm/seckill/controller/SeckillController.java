@@ -12,7 +12,6 @@ import com.lxm.seckill.service.GoodsService;
 import com.lxm.seckill.service.OrderService;
 import com.lxm.seckill.service.SeckillOrderService;
 import com.lxm.seckill.utils.Const;
-import com.lxm.seckill.utils.MD5Utils;
 import com.lxm.seckill.vo.GoodsVo;
 import com.lxm.seckill.vo.RespBean;
 import com.lxm.seckill.vo.RespBeanEnum;
@@ -80,9 +79,6 @@ public class SeckillController implements InitializingBean {
     }
 
     /**
-
-     */
-    /**
      * 秒杀接口
      * 700 (windows)
      * redis 1800
@@ -140,10 +136,10 @@ public class SeckillController implements InitializingBean {
 
     /**
      * 秒杀接口
-     * @param goodsId
-     * @param path
-     * @param user
-     * @return
+     * @param goodsId   商品id
+     * @param path      秒杀路径
+     * @param user      用户
+     * @return          ..
      */
     @PostMapping("/{path}")
     @AccessLimit
@@ -157,9 +153,9 @@ public class SeckillController implements InitializingBean {
 
     /**
      * 获取秒杀结果
-     * @param goodsId
-     * @param user
-     * @return
+     * @param goodsId   商品id
+     * @param user      用户
+     * @return          ..
      */
     @GetMapping("/result")
     @AccessLimit
@@ -186,9 +182,9 @@ public class SeckillController implements InitializingBean {
 
     /**
      * 获取秒杀路径
-     * @param goodsId
-     * @param user
-     * @return
+     * @param goodsId   商品id
+     * @param user      用户
+     * @return          ..
      */
     @GetMapping("/path/{goodsId}")
     @AccessLimit(seconds = 60, maxCount = 20)
@@ -199,10 +195,7 @@ public class SeckillController implements InitializingBean {
 
     /**
      * Redis 预加载库存
-     *
-     * @throws Exception
      */
-
     @Override
     public void afterPropertiesSet() throws Exception {
         List<GoodsVo> list = goodsService.findGoodsVoList();

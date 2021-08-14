@@ -33,14 +33,15 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
-    /**
-     * 登录方法
-     * @param loginVo loginVo
-     */
+
 
     @Autowired
     RedisTemplate<String,Object> redisTemplate;
 
+    /**
+     * 登录方法
+     * @param loginVo loginVo
+     */
     @Override
     public RespBean doLogin(LoginVo loginVo, HttpServletRequest req, HttpServletResponse resp) {
         String mobile = loginVo.getMobile();

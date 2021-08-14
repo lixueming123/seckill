@@ -1,6 +1,7 @@
 package com.lxm.seckill.config;
 
 import com.lxm.seckill.entity.User;
+import com.lxm.seckill.service.OrderService;
 import com.lxm.seckill.service.UserService;
 import com.lxm.seckill.utils.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
