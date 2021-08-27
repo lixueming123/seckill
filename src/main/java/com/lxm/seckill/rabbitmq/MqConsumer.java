@@ -57,11 +57,13 @@ public class MqConsumer {
         // 下单
         try {
             orderService.seckillOrder(payload.getUser(), goods);
-        } catch (DuplicateKeyException e) {
+        }
+        catch (DuplicateKeyException e) {
             log.warn("用户重复抢购，用户id为:{}", payload.getUser().getId());
             redisTemplate.opsForValue().increment(Const.SECKILL_GOODS_PREFIX + goods.getId());
             SeckillController.emptyStock.put(goods.getId(), false);
-        } catch (GlobalException e) {
+        }
+        catch (GlobalException e) {
             log.warn("库存不足");
             redisTemplate.opsForValue().increment(Const.SECKILL_GOODS_PREFIX + goods.getId());
             SeckillController.emptyStock.put(goods.getId(), false);

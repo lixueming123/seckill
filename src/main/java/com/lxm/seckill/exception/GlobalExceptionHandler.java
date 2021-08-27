@@ -14,7 +14,8 @@ public class GlobalExceptionHandler {
         if (exception instanceof GlobalException) {
             GlobalException ex = (GlobalException) exception;
             return RespBean.error(ex.getRespBeanEnum());
-        } else if (exception instanceof BindException) {
+        }
+        else if (exception instanceof BindException) {
             BindException ex = (BindException) exception;
             RespBean respBean = RespBean.error(RespBeanEnum.BIND_ERROR);
             respBean.setMessage("参数校验异常: " + ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());

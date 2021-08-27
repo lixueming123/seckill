@@ -11,7 +11,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.List;
 
 @Configuration
-@EnableSwagger2
+//@EnableSwagger2
 public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
@@ -23,16 +23,16 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     AccessLimitInterceptor accessLimitInterceptor;
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/");
-        registry.addResourceHandler("/swagger-ui.html").
-                addResourceLocations("classpath:/META-INF/resources/");
-        // 解决swagger的js文件无法访问
-        registry.addResourceHandler("/webjars/**").
-                addResourceLocations("classpath:/META-INF/resources/webjars/");
-    }
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        registry.addResourceHandler("/**")
+//                .addResourceLocations("classpath:/static/");
+//        registry.addResourceHandler("/swagger-ui.html").
+//                addResourceLocations("classpath:/META-INF/resources/");
+//        // 解决swagger的js文件无法访问
+//        registry.addResourceHandler("/webjars/**").
+//                addResourceLocations("classpath:/META-INF/resources/webjars/");
+//    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

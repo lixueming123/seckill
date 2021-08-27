@@ -45,6 +45,56 @@ public class GoodsController {
     @Autowired
     RedisTemplate<String,Object> redisTemplate;
 
+    @GetMapping("/list")
+    @AccessLimit
+    public RespBean list(User user) {
+        if (user == null) {
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+
+        Object goodsList = redisTemplate.opsForValue().get("goodsList");
+        if (goodsList != null) {
+            return RespBean.success(goodsList);
+        }
+
+        List<GoodsVo> goodsVoList = goodsService.findGoodsVoList();
+        redisTemplate.opsForValue().set("goodsList", goodsVoList, 60, TimeUnit.SECONDS);
+        return RespBean.success(goodsVoList);
+    }
+
+    @GetMapping("/detail/{goodsId}")
+    @AccessLimit
+    public RespBean detail(User user, @PathVariable Long goodsId) {
+        DetailVo detailVo = new DetailVo();
+
+        GoodsVo goodsVo = goodsService.findGoodsVoById(goodsId);
+        Date startDate = goodsVo.getStartDate();
+        Date endDate = goodsVo.getEndDate();
+        Date nowDate = new Date();
+
+        detailVo.setGoodsVo(goodsVo);
+
+        int secKillStatus;
+        int remainSeconds;
+        //
+        if (nowDate.before(startDate)) { // 秒杀未开始
+            secKillStatus = 0;
+            remainSeconds = (int) ((startDate.getTime() - nowDate.getTime()) / 1000);
+        } else if (nowDate.after(endDate)) { // 秒杀已经结束
+            secKillStatus = 2;
+            remainSeconds = -1;
+        } else { // 秒杀进行中
+            secKillStatus = 1;
+            remainSeconds = 0;
+        }
+
+        detailVo.setUser(user);
+        detailVo.setRemainSeconds(remainSeconds);
+        detailVo.setSecKillStatus(secKillStatus);
+
+        return RespBean.success(detailVo);
+    }
+
     /**
      * 跳转到商品列表页面
      * (windows)：优化前 1478.9
@@ -68,23 +118,6 @@ public class GoodsController {
         html = thymeleafViewResolver.getTemplateEngine().process("goodsList", context);
         ops.set("goodsList", html, 60, TimeUnit.SECONDS);
         return html;
-    }
-
-    @GetMapping("/list")
-    @AccessLimit
-    public RespBean list(User user) {
-        if (user == null) {
-            return RespBean.error(RespBeanEnum.SESSION_ERROR);
-        }
-
-        Object goodsList = redisTemplate.opsForValue().get("goodsList");
-        if (goodsList != null) {
-            return RespBean.success(goodsList);
-        }
-
-        List<GoodsVo> goodsVoList = goodsService.findGoodsVoList();
-        redisTemplate.opsForValue().set("goodsList", goodsVoList, 60, TimeUnit.SECONDS);
-        return RespBean.success(goodsVoList);
     }
 
     /**
@@ -137,39 +170,6 @@ public class GoodsController {
         ops.set("goodsDetail:" + goodsId, goodsDetail, 60, TimeUnit.SECONDS);
 
         return goodsDetail;
-    }
-
-    @GetMapping("/detail/{goodsId}")
-    @AccessLimit
-    public RespBean detail(User user, @PathVariable Long goodsId) {
-        DetailVo detailVo = new DetailVo();
-
-        GoodsVo goodsVo = goodsService.findGoodsVoById(goodsId);
-        Date startDate = goodsVo.getStartDate();
-        Date endDate = goodsVo.getEndDate();
-        Date nowDate = new Date();
-
-        detailVo.setGoodsVo(goodsVo);
-
-        int secKillStatus;
-        int remainSeconds;
-        //
-        if (nowDate.before(startDate)) { // 秒杀未开始
-            secKillStatus = 0;
-            remainSeconds = (int) ((startDate.getTime() - nowDate.getTime()) / 1000);
-        } else if (nowDate.after(endDate)) { // 秒杀已经结束
-            secKillStatus = 2;
-            remainSeconds = -1;
-        } else { // 秒杀进行中
-            secKillStatus = 1;
-            remainSeconds = 0;
-        }
-
-        detailVo.setUser(user);
-        detailVo.setRemainSeconds(remainSeconds);
-        detailVo.setSecKillStatus(secKillStatus);
-
-        return RespBean.success(detailVo);
     }
 
 }

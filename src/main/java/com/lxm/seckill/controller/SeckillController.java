@@ -152,6 +152,19 @@ public class SeckillController implements InitializingBean {
     }
 
     /**
+     * 获取秒杀路径
+     * @param goodsId   商品id
+     * @param user      用户
+     * @return          ..
+     */
+    @GetMapping("/path/{goodsId}")
+    @AccessLimit(seconds = 60, maxCount = 20)
+    public RespBean getPath(@PathVariable("goodsId") Long goodsId, User user) {
+        String path = orderService.createPath(user, goodsId);
+        return RespBean.success(path);
+    }
+
+    /**
      * 获取秒杀结果
      * @param goodsId   商品id
      * @param user      用户
@@ -178,19 +191,6 @@ public class SeckillController implements InitializingBean {
         }
 
         return RespBean.success(0L);
-    }
-
-    /**
-     * 获取秒杀路径
-     * @param goodsId   商品id
-     * @param user      用户
-     * @return          ..
-     */
-    @GetMapping("/path/{goodsId}")
-    @AccessLimit(seconds = 60, maxCount = 20)
-    public RespBean getPath(@PathVariable("goodsId") Long goodsId, User user) {
-        String path = orderService.createPath(user, goodsId);
-        return RespBean.success(path);
     }
 
     /**

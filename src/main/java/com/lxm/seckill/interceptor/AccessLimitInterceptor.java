@@ -67,9 +67,11 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
             Integer cnt = (Integer) ops.get(key);
             if (cnt == null) {
                 ops.set(key, 1, seconds, TimeUnit.SECONDS);
-            } else if (cnt < maxCount) {
+            }
+            else if (cnt < maxCount) {
                 ops.increment(key);
-            } else {
+            }
+            else {
                 writeError(response, RespBeanEnum.ACCESS_LIMIT_REACHED);
                 return false;
             }
