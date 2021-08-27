@@ -49,35 +49,6 @@ public class SeckillController implements InitializingBean {
     public static ConcurrentHashMap<Long, Boolean> emptyStock = new ConcurrentHashMap<>();
 
 
-    //@PostMapping
-    @Deprecated
-    public String seckill(Long goodsId, User user, Model model) {
-
-        model.addAttribute("user", user);
-        // 判断是否重复抢购
-        SeckillOrder seckillOrder = seckillOrderService.getOne(
-                new QueryWrapper<SeckillOrder>()
-                        .eq("user_id", user.getId())
-                        .eq("goods_id", goodsId));
-
-        if (seckillOrder != null) {
-            model.addAttribute("errmsg", RespBeanEnum.REPEAT_ERROR.getMessage());
-            return "secKillFail";
-        }
-
-        // 判断库存
-        GoodsVo goodsVo = goodsService.findGoodsVoById(goodsId);
-        if (goodsVo.getStockCount() < 1) {
-            model.addAttribute("errmsg", RespBeanEnum.EMPTY_STOCK.getMessage());
-            return "secKillFail";
-        }
-
-        model.addAttribute("goods", goodsVo);
-        Order order = orderService.seckillOrder(user, goodsVo);
-        model.addAttribute("order", order);
-        return "orderDetail";
-    }
-
     /**
      * 秒杀接口
      * 700 (windows)
@@ -211,5 +182,34 @@ public class SeckillController implements InitializingBean {
 
             redisTemplate.delete(Const.IS_STOCK_EMPTY_PREFIX + goodsVo.getId());
         }
+    }
+
+    //@PostMapping
+    @Deprecated
+    public String seckill(Long goodsId, User user, Model model) {
+
+        model.addAttribute("user", user);
+        // 判断是否重复抢购
+        SeckillOrder seckillOrder = seckillOrderService.getOne(
+                new QueryWrapper<SeckillOrder>()
+                        .eq("user_id", user.getId())
+                        .eq("goods_id", goodsId));
+
+        if (seckillOrder != null) {
+            model.addAttribute("errmsg", RespBeanEnum.REPEAT_ERROR.getMessage());
+            return "secKillFail";
+        }
+
+        // 判断库存
+        GoodsVo goodsVo = goodsService.findGoodsVoById(goodsId);
+        if (goodsVo.getStockCount() < 1) {
+            model.addAttribute("errmsg", RespBeanEnum.EMPTY_STOCK.getMessage());
+            return "secKillFail";
+        }
+
+        model.addAttribute("goods", goodsVo);
+        Order order = orderService.seckillOrder(user, goodsVo);
+        model.addAttribute("order", order);
+        return "orderDetail";
     }
 }
