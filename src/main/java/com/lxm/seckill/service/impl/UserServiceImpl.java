@@ -76,9 +76,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         User user = (User) redisTemplate.opsForValue().get("user:" + ticket);
-        redisTemplate.expire("user:" + ticket, 7, TimeUnit.DAYS);
 
         if (user != null) {
+            redisTemplate.expire("user:" + ticket, 7, TimeUnit.DAYS);
             CookieUtil.setCookie(request, response, "userTicket", ticket, 7 * 24 * 60 * 60);
         }
         return user;
