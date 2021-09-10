@@ -81,7 +81,7 @@ public class UserController {
             list.add(user);
             fos.write((ticket + "," +user.getId() + "\r\n").getBytes());
 
-            redisTemplate.opsForValue().set("user:"+ticket, user, 3, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set("user:"+ticket, user, 365, TimeUnit.DAYS);
         }
 
         userService.saveBatch(list, 1000);

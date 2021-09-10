@@ -147,6 +147,10 @@ public class SeckillController implements InitializingBean {
         if (user == null) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
+        // 库存判断
+        if (redisTemplate.opsForValue().get(Const.IS_STOCK_EMPTY_PREFIX + goodsId) != null) {
+            return RespBean.success(-1L);
+        }
 
         SeckillOrder order = seckillOrderService.getOne(new QueryWrapper<SeckillOrder>()
                 .eq("goods_id", goodsId)
@@ -155,10 +159,6 @@ public class SeckillController implements InitializingBean {
         // 订单存在直接返回
         if (order != null) {
             return RespBean.success(order.getOrderId() + "");
-        }
-        // 库存判断
-        if (redisTemplate.opsForValue().get(Const.IS_STOCK_EMPTY_PREFIX + goodsId) != null) {
-            return RespBean.success(-1L);
         }
 
         return RespBean.success(0L);
