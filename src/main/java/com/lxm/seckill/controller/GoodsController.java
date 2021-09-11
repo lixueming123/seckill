@@ -1,22 +1,20 @@
 package com.lxm.seckill.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lxm.seckill.config.AccessLimit;
+import com.lxm.seckill.entity.Goods;
+import com.lxm.seckill.entity.SeckillGoods;
 import com.lxm.seckill.entity.User;
 import com.lxm.seckill.service.GoodsService;
+import com.lxm.seckill.service.SeckillGoodsService;
 import com.lxm.seckill.service.UserService;
-import com.lxm.seckill.vo.DetailVo;
-import com.lxm.seckill.vo.GoodsVo;
-import com.lxm.seckill.vo.RespBean;
-import com.lxm.seckill.vo.RespBeanEnum;
+import com.lxm.seckill.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
@@ -36,6 +34,11 @@ public class GoodsController {
     @Autowired
     GoodsService goodsService;
 
+    @Autowired
+    SeckillGoodsService seckillGoodsService;
+
+    @Autowired
+    SeckillController seckillController;
     /*
     * 页面静态化
     * */
@@ -58,7 +61,18 @@ public class GoodsController {
         }
 
         List<GoodsVo> goodsVoList = goodsService.findGoodsVoList();
-        redisTemplate.opsForValue().set("goodsList", goodsVoList, 60, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set("goodsList", goodsVoList, 5, TimeUnit.SECONDS);
+        return RespBean.success(goodsVoList);
+    }
+
+    @GetMapping("/admin/list")
+    @AccessLimit
+    public RespBean adminList(User user) {
+        if (user == null) {
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+
+        List<GoodsVo> goodsVoList = goodsService.findGoodsVoList();
         return RespBean.success(goodsVoList);
     }
 
@@ -93,6 +107,62 @@ public class GoodsController {
         detailVo.setSecKillStatus(secKillStatus);
 
         return RespBean.success(detailVo);
+    }
+
+    @GetMapping("/delete/{goodsId}")
+    @AccessLimit
+    public RespBean delete(User user, @PathVariable("goodsId")Long goodsId) {
+        goodsService.removeById(goodsId);
+        seckillGoodsService.remove(new QueryWrapper<SeckillGoods>().eq("goods_id", goodsId));
+        return RespBean.success();
+    }
+
+    @PostMapping("/edit")
+    @AccessLimit
+    public RespBean add(@RequestBody GoodsVoRequest goodsVo) {
+        if (goodsVo.getId() == null) {
+            Goods goods = new Goods();
+            goods.setGoodsDetail(goodsVo.getGoodsDetail());
+            goods.setGoodsImg("/img/iphone12.png");
+            goods.setGoodsPrice(goodsVo.getGoodsPrice());
+            goods.setGoodsStock(goodsVo.getStockCount());
+            goods.setGoodsName(goodsVo.getGoodsName());
+            goods.setGoodsTitle(goodsVo.getGoodsTitle());
+            goodsService.saveOrUpdate(goods);
+
+            SeckillGoods seckillGoods = new SeckillGoods();
+            seckillGoods.setSeckillPrice(goodsVo.getSeckillPrice());
+            seckillGoods.setGoodsId(goods.getId());
+            seckillGoods.setStockCount(goodsVo.getStockCount());
+            seckillGoods.setStartDate(new Date());
+            seckillGoods.setEndDate(new Date(new Date().getTime() + 7L * 1000 * 60 * 60 * 24));
+            seckillGoodsService.saveOrUpdate(seckillGoods);
+        }
+        else {
+            Goods goods = new Goods();
+            goods.setId(goodsVo.getId());
+            goods.setGoodsDetail(goodsVo.getGoodsDetail());
+            goods.setGoodsImg("/img/iphone12.png");
+            goods.setGoodsPrice(goodsVo.getGoodsPrice());
+            goods.setGoodsStock(goodsVo.getStockCount());
+            goods.setGoodsName(goodsVo.getGoodsName());
+            goods.setGoodsTitle(goodsVo.getGoodsTitle());
+            goodsService.saveOrUpdate(goods);
+
+            SeckillGoods seckillGoods = new SeckillGoods();
+            seckillGoods.setId(goodsVo.getId());
+            seckillGoods.setGoodsId(goods.getId());
+            seckillGoods.setStockCount(goods.getGoodsStock());
+            seckillGoods.setStartDate(new Date());
+            seckillGoods.setEndDate(new Date(new Date().getTime() + 7L * 1000 * 60 * 60 * 24));
+            seckillGoodsService.saveOrUpdate(seckillGoods);
+        }
+        try {
+            seckillController.afterPropertiesSet();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return RespBean.success();
     }
 
     /**

@@ -2,8 +2,11 @@ package com.lxm.seckill.controller;
 
 
 import com.lxm.seckill.config.AccessLimit;
+import com.lxm.seckill.entity.Order;
 import com.lxm.seckill.entity.User;
+import com.lxm.seckill.exception.GlobalException;
 import com.lxm.seckill.service.OrderService;
+import com.lxm.seckill.vo.OrderResult;
 import com.lxm.seckill.vo.OrderVo;
 import com.lxm.seckill.vo.RespBean;
 import com.lxm.seckill.vo.RespBeanEnum;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>
@@ -38,6 +43,26 @@ public class OrderController {
 
         OrderVo orderVo = orderService.getOrderDetail(orderId);
         return RespBean.success(orderVo);
+    }
+
+    @GetMapping("admin/list")
+    @AccessLimit
+    public RespBean getOrderResultList() {
+        List<OrderResult> orderList = orderService.getOrderList();
+        return RespBean.success(orderList);
+    }
+
+    @GetMapping("/pay/{orderId}")
+    @AccessLimit
+    public RespBean pay(@PathVariable("orderId") Long orderId) {
+        Order order = orderService.getById(orderId);
+        if (order == null) {
+            throw new GlobalException(RespBeanEnum.ORDER_NOT_EXIST);
+        }
+
+        order.setStatus(2);
+        orderService.saveOrUpdate(order);
+        return RespBean.success("支付成功");
     }
 
 }

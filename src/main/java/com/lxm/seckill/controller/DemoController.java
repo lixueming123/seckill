@@ -2,7 +2,6 @@ package com.lxm.seckill.controller;
 
 import cn.hutool.core.map.MapBuilder;
 import com.lxm.seckill.entity.User;
-import com.lxm.seckill.interceptor.LoginInterceptor;
 import com.lxm.seckill.rabbitmq.MqConsumer;
 import com.lxm.seckill.rabbitmq.MqSender;
 import com.lxm.seckill.vo.LoginVo;

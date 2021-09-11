@@ -4,7 +4,10 @@ import com.lxm.seckill.entity.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lxm.seckill.entity.User;
 import com.lxm.seckill.vo.GoodsVo;
+import com.lxm.seckill.vo.OrderResult;
 import com.lxm.seckill.vo.OrderVo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,6 +20,8 @@ import com.lxm.seckill.vo.OrderVo;
 public interface OrderService extends IService<Order> {
 
     Order seckillOrder(User user, GoodsVo goodsVo);
+
+    List<OrderResult> getOrderList();
 
     OrderVo getOrderDetail(Long orderId);
 

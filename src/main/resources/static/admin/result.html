@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>秒杀结果列表</title>
+    <!-- jquery -->
+    <script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.min.css"/>
+    <script type="text/javascript" src="../bootstrap/js/bootstrap.min.js"></script>
+    <!-- layer -->
+    <script type="text/javascript" src="../layer/layer.js"></script>
+    <!-- common.js -->
+    <script type="text/javascript" src="../js/common.js"></script>
+</head>
+<body>
+<div class="panel panel-default">
+    <a href="result.html">秒杀结果列表</a>
+    <a href="list.html">后台商品列表</a>
+    <a href="edit.html">添加</a>
+
+    <table class="table" id="goods-list">
+    </table>
+</div>
+</body>
+
+<script>
+
+    $(function () {
+        getSecResult();
+    });
+
+    function getSecResult() {
+        $.ajax({
+            url: '/order/admin/list',
+            type: 'get',
+            success: function (data) {
+                if (data.code === 200) {
+                    render(data.obj)
+                } else {
+                    layer.msg(data.message)
+                    window.location.href='login.html'
+                }
+            },
+            error: function (data) {
+                layer.msg("客户端请求错误")
+            }
+        })
+    }
+
+    // <tr id="goods">
+    //     <td id="goodsName"></td>
+    //     <td>
+    //        <img id="goodsImg" width="100" height="100"/>
+    //     </td>
+    //     <td id="goodsPrice"></td>
+    //     <td id="seckillPrice"></td>
+    //     <td id="stockCount"></td>
+    //     <td>
+    //     <a >详情</a>
+    //     </td>
+    // </tr>
+
+
+    function render(orderList) {
+        var html = '<tr>\n' +
+            '            <td>用户昵称</td>\n' +
+            '            <td>商品名称</td>\n' +
+            '            <td>商品图片</td>\n' +
+            '            <td>商品原价</td>\n' +
+            '            <td>秒杀价</td>\n' +
+            '            <td>库存数量</td>\n' +
+            '            <td>商品详情</td>\n' +
+            '            <td>详情链接</td>\n' +
+            '            <td>创建时间</td>\n' +
+            '            <td>订单状态</td>\n' +
+            '        </tr>';
+
+
+
+        for (let i = 0; i < orderList.length; i++) {
+            const orderResult = orderList[i];
+            const orderVo = orderResult.orderVo
+            const goods = orderVo.goods;
+            const order = orderVo.order;
+
+            const date = new Date(order.createDate).format("yyyy-MM-dd HH:mm:ss");
+
+            // <!--                <span if="${order.status eq 0}">未支付</span>-->
+            //     <!--                <span if="${order.status eq 1}">待发货</span>-->
+            //     <!--                <span if="${order.status eq 2}">已发货</span>-->
+            //     <!--                <span if="${order.status eq 3}">已收货</span>-->
+            //     <!--                <span if="${order.status eq 4}">已退款</span>-->
+            //     <!--                <span if="${order.status eq 5}">已完成</span>-->
+
+            let status = "";
+            switch (order.status) {
+                case 0:
+                    status = "未支付";
+                    break;
+                case 1:
+                    status = "待发货";
+                    break;
+                case 2:
+                    status = "已发货";
+                    break;
+                case 3:
+                    status = "已收货";
+                    break;
+                case 4:
+                    status = "已退款";
+                    break;
+                case 5:
+                    status = "已完成";
+                    break;
+            }
+
+            const goodsId = goods.id;
+            const goodsName = goods.goodsName;
+            const goodsImg = goods.goodsImg;
+            const goodsPrice = goods.goodsPrice;
+            const seckillPrice = goods.seckillPrice;
+            const stockCount = goods.stockCount;
+            const goodsDetail = goods.goodsDetail;
+
+            var str = '<tr>\n' +
+                '            <td>'+ orderResult.userNickName +'</td>\n' +
+                '            <td>'+ goodsName +'</td>\n' +
+                '            <td>'+ '<img src="' + goodsImg + '" alt="" width="100" height="100">' +'</td>\n' +
+                '            <td>'+ goodsPrice +'</td>\n' +
+                '            <td>'+ seckillPrice +'</td>\n' +
+                '            <td>' + stockCount +'</td>\n' +
+                '            <td>'+ goodsDetail +'</td>\n' +
+                '            <td>'+ '<a href="../goodsDetail.html?goodsId=' + goodsId +'">详情<a/>' +'</td>\n' +
+                '            <td>'+ date +'</td>\n' +
+                '            <td>'+ status +'</td>\n' +
+                '     </tr>';
+            html += str;
+        }
+        $("#goods-list").html(html)
+    }
+
+</script>
+
+
+</html>

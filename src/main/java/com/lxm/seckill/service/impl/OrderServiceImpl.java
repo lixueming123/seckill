@@ -3,29 +3,27 @@ package com.lxm.seckill.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lxm.seckill.controller.OrderController;
 import com.lxm.seckill.entity.Order;
 import com.lxm.seckill.entity.SeckillGoods;
 import com.lxm.seckill.entity.SeckillOrder;
 import com.lxm.seckill.entity.User;
 import com.lxm.seckill.exception.GlobalException;
 import com.lxm.seckill.mapper.OrderMapper;
-import com.lxm.seckill.service.GoodsService;
-import com.lxm.seckill.service.OrderService;
-import com.lxm.seckill.service.SeckillGoodsService;
-import com.lxm.seckill.service.SeckillOrderService;
+import com.lxm.seckill.service.*;
 import com.lxm.seckill.utils.Const;
 import com.lxm.seckill.utils.MD5Utils;
-import com.lxm.seckill.vo.GoodsVo;
-import com.lxm.seckill.vo.OrderVo;
-import com.lxm.seckill.vo.RespBean;
-import com.lxm.seckill.vo.RespBeanEnum;
+import com.lxm.seckill.vo.*;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,6 +49,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     GoodsService goodsService;
 
+    @Autowired
+    UserService userService;
     @Autowired
     RedisTemplate<String, Object> redisTemplate;
 
@@ -107,6 +107,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     @Override
+    public List<OrderResult> getOrderList() {
+        List<Order> list = this.list();
+        List<OrderResult> orderResults = new ArrayList<>();
+        for (Order order : list) {
+            OrderResult orderResult = new OrderResult();
+            OrderVo orderVo = new OrderVo();
+            orderVo.setOrder(order);
+            GoodsVo goodsVo = goodsService.findGoodsVoById(order.getGoodsId());
+            User user = userService.getById(order.getUserId());
+            orderVo.setGoods(goodsVo);
+            orderResult.setOrderVo(orderVo);
+            orderResult.setUserNickName(user.getNickname());
+            orderResults.add(orderResult);
+        }
+        return orderResults;
+    }
+
+    @Override
     public OrderVo getOrderDetail(Long orderId) {
         Order order = this.getById(orderId);
         if (order == null) {
@@ -136,7 +154,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (user == null || goodsId < 0 || !StringUtils.hasText(path)) {
             return false;
         }
-        Object o = redisTemplate.opsForValue().get(Const.SECKILL_PATH_PREFIX + user.getId() + ":" + goodsId);
-        return o != null;
+        String p = (String) redisTemplate.opsForValue().get(Const.SECKILL_PATH_PREFIX + user.getId() + ":" + goodsId);
+        return path.equals(p);
     }
 }

@@ -57,11 +57,11 @@ spring:
     listener:
       simple:
         # 消费者的最小数量
-        concurrency: 10
+        concurrency: 50
         # 消费者的最大数量
-        max-concurrency: 10
+        max-concurrency: 50
         # 限制消费者，每次处理一条消息
-        prefetch: 1
+        prefetch: 3
         # 启动时默认启动容器
         auto-startup: true
         # 被拒绝时是否重新入队

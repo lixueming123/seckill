@@ -45,7 +45,7 @@
 <!--            </td>-->
             <td id="status"></td>
             <td>
-                <button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
+                <button class="btn btn-primary btn-block" type="submit" id="payButton" onclick="pay()">立即支付</button>
             </td>
         </tr>
         <tr>
@@ -61,6 +61,26 @@
 </body>
 
 <script>
+
+    function pay() {
+        var orderId = g_getQueryString("orderId")
+        $.ajax({
+            url: "/order/pay/" + orderId,
+            type: "GET",
+            success: function (data) {
+                if (data.code === 200) {
+                    layer.msg(data.obj)
+                    $("#status").text("待发货")
+                } else {
+                    layer.msg(data.message)
+                }
+            },
+            error: function (data) {
+                layer.msg("客户端请求异常")
+            }
+        })
+    }
+
     $(function () {
         getOrderDetail();
     });

@@ -1,7 +1,6 @@
 package com.lxm.seckill.config;
 
 import com.lxm.seckill.interceptor.AccessLimitInterceptor;
-import com.lxm.seckill.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

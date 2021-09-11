@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <title>商品列表</title>
     <!-- jquery -->
-    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
     <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css"/>
-    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.min.css"/>
+    <script type="text/javascript" src="../bootstrap/js/bootstrap.min.js"></script>
     <!-- layer -->
-    <script type="text/javascript" src="layer/layer.js"></script>
+    <script type="text/javascript" src="../layer/layer.js"></script>
     <!-- common.js -->
-    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
 </head>
 <body>
 <div class="panel panel-default">
-    <div class="panel-heading">商品列表</div>
+    <a href="result.html">秒杀结果列表</a>
+    <a href="list.html">后台商品列表</a>
+    <a href="edit.html">添加</a>
+
     <table class="table" id="goods-list">
     </table>
 </div>
@@ -24,19 +27,19 @@
 <script>
 
     $(function () {
-       getGoodsList();
+        getGoodsList();
     });
 
     function getGoodsList() {
         $.ajax({
-            url: '/goods/list',
+            url: '/goods/admin/list',
             type: 'get',
             success: function (data) {
                 if (data.code === 200) {
                     render(data.obj)
                 } else {
                     layer.msg(data.message)
-                    window.location.href='admin/login.html'
+                    window.location.href='login.html'
                 }
             },
             error: function (data) {
@@ -58,6 +61,28 @@
     //     </td>
     // </tr>
 
+    function del(goodsId) {
+        $.ajax({
+            url: '/goods/delete/' + goodsId,
+            type: 'get',
+            success: function (data) {
+                if (data.code === 200) {
+
+                    window.location.reload();
+                } else {
+                    layer.msg(data.message)
+                }
+            },
+            error: function (data) {
+                layer.msg("客户端请求错误")
+            }
+        })
+    }
+
+    function modify(goodsId) {
+        window.location.href = 'edit.html?goodsId=' + goodsId;
+    }
+
     function render(goodsList) {
         var html = '<tr>\n' +
             '            <td>商品名称</td>\n' +
@@ -66,6 +91,8 @@
             '            <td>秒杀价</td>\n' +
             '            <td>库存数量</td>\n' +
             '            <td>详情</td>\n' +
+            '            <td>删除</td>\n' +
+            '            <td>修改</td>\n' +
             '        </tr>';
 
         for (let i = 0; i < goodsList.length; i++) {
@@ -77,6 +104,7 @@
             const seckillPrice = goods.seckillPrice;
             const stockCount = goods.stockCount;
             const goodsDetail = goods.goodsDetail;
+
             var str = '<tr>\n' +
                 '            <td>'+ goodsName +'</td>\n' +
                 '            <td>'+ '<img src="' + goodsImg + '" alt="" width="100" height="100">' +'</td>\n' +
@@ -84,7 +112,9 @@
                 '            <td>'+ seckillPrice +'</td>\n' +
                 '            <td>' + stockCount +'</td>\n' +
                 '            <td>'+ goodsDetail +'</td>\n' +
-                '            <td>'+ '<a href="goodsDetail.html?goodsId=' + goodsId +'">详情<a/>' +'</td>\n' +
+                '            <td>'+ '<a href="../goodsDetail.html?goodsId=' + goodsId +'">详情<a/>' +'</td>\n' +
+                '            <td>'+ '<button onclick="del(' + goodsId + ')">删除</button>' +
+                '            <td>'+ '<button onclick="modify(' + goodsId + ')">修改</button>' +
                 '     </tr>';
             html += str;
         }
@@ -92,4 +122,6 @@
     }
 
 </script>
+
+
 </html>
