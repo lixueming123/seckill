@@ -8,6 +8,7 @@ import com.lxm.seckill.entity.User;
 import com.lxm.seckill.service.GoodsService;
 import com.lxm.seckill.service.SeckillGoodsService;
 import com.lxm.seckill.service.UserService;
+import com.lxm.seckill.utils.Const;
 import com.lxm.seckill.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -114,23 +115,27 @@ public class GoodsController {
     public RespBean delete(User user, @PathVariable("goodsId")Long goodsId) {
         goodsService.removeById(goodsId);
         seckillGoodsService.remove(new QueryWrapper<SeckillGoods>().eq("goods_id", goodsId));
+        redisTemplate.delete(Const.SECKILL_GOODS_PREFIX + goodsId);
+        SeckillController.emptyStock.remove(goodsId);
         return RespBean.success();
     }
 
     @PostMapping("/edit")
     @AccessLimit
     public RespBean add(@RequestBody GoodsVoRequest goodsVo) {
+        ValueOperations<String, Object> ops = redisTemplate.opsForValue();
+        SeckillGoods seckillGoods = new SeckillGoods();
+        Goods goods = new Goods();
         if (goodsVo.getId() == null) {
-            Goods goods = new Goods();
             goods.setGoodsDetail(goodsVo.getGoodsDetail());
-            goods.setGoodsImg("/img/iphone12.png");
+            if (goodsVo.getGoodsImg() == null) goods.setGoodsImg("/img/iphone12.png");
+            else goods.setGoodsImg(goodsVo.getGoodsImg());
             goods.setGoodsPrice(goodsVo.getGoodsPrice());
             goods.setGoodsStock(goodsVo.getStockCount());
             goods.setGoodsName(goodsVo.getGoodsName());
             goods.setGoodsTitle(goodsVo.getGoodsTitle());
             goodsService.saveOrUpdate(goods);
 
-            SeckillGoods seckillGoods = new SeckillGoods();
             seckillGoods.setSeckillPrice(goodsVo.getSeckillPrice());
             seckillGoods.setGoodsId(goods.getId());
             seckillGoods.setStockCount(goodsVo.getStockCount());
@@ -139,29 +144,29 @@ public class GoodsController {
             seckillGoodsService.saveOrUpdate(seckillGoods);
         }
         else {
-            Goods goods = new Goods();
             goods.setId(goodsVo.getId());
             goods.setGoodsDetail(goodsVo.getGoodsDetail());
-            goods.setGoodsImg("/img/iphone12.png");
+            if (goodsVo.getGoodsImg() != null) goods.setGoodsImg(goodsVo.getGoodsImg());
             goods.setGoodsPrice(goodsVo.getGoodsPrice());
             goods.setGoodsStock(goodsVo.getStockCount());
             goods.setGoodsName(goodsVo.getGoodsName());
             goods.setGoodsTitle(goodsVo.getGoodsTitle());
             goodsService.saveOrUpdate(goods);
 
-            SeckillGoods seckillGoods = new SeckillGoods();
             seckillGoods.setId(goodsVo.getId());
             seckillGoods.setGoodsId(goods.getId());
-            seckillGoods.setStockCount(goods.getGoodsStock());
+            seckillGoods.setStockCount(goodsVo.getStockCount());
             seckillGoods.setStartDate(new Date());
             seckillGoods.setEndDate(new Date(new Date().getTime() + 7L * 1000 * 60 * 60 * 24));
             seckillGoodsService.saveOrUpdate(seckillGoods);
         }
-        try {
-            seckillController.afterPropertiesSet();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        SeckillController.emptyStock.put(goods.getId(), false);
+        ops.set(Const.SECKILL_GOODS_PREFIX + goods.getId(), seckillGoods.getStockCount(),
+                seckillGoods.getEndDate().getTime() - seckillGoods.getStartDate().getTime() + 1000 * 60,
+                TimeUnit.MILLISECONDS
+        );
+
         return RespBean.success();
     }
 
