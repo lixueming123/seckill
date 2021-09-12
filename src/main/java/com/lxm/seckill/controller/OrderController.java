@@ -60,7 +60,7 @@ public class OrderController {
             throw new GlobalException(RespBeanEnum.ORDER_NOT_EXIST);
         }
 
-        order.setStatus(2);
+        order.setStatus(1);
         orderService.saveOrUpdate(order);
         return RespBean.success("支付成功");
     }

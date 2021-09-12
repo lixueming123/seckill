@@ -129,7 +129,7 @@ public class SeckillController implements InitializingBean {
      * @return          ..
      */
     @GetMapping("/path/{goodsId}")
-    @AccessLimit(seconds = 60, maxCount = 20)
+    @AccessLimit(seconds = 60, maxCount = 10)
     public RespBean getPath(@PathVariable("goodsId") Long goodsId, User user) {
         String path = orderService.createPath(user, goodsId);
         return RespBean.success(path);

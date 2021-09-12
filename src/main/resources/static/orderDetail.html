@@ -71,6 +71,8 @@
                 if (data.code === 200) {
                     layer.msg(data.obj)
                     $("#status").text("待发货")
+                    $("#payButton").attr("disabled", true);
+                    $("#payButton").text("已支付")
                 } else {
                     layer.msg(data.message)
                 }
