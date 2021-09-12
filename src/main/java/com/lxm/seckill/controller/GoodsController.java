@@ -73,6 +73,10 @@ public class GoodsController {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
 
+        if (user.getId() != 13212345678L) {
+            return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
+        }
+
         List<GoodsVo> goodsVoList = goodsService.findGoodsVoList();
         return RespBean.success(goodsVoList);
     }
@@ -113,6 +117,11 @@ public class GoodsController {
     @GetMapping("/delete/{goodsId}")
     @AccessLimit
     public RespBean delete(User user, @PathVariable("goodsId")Long goodsId) {
+
+        if (user.getId() != 13212345678L) {
+            return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
+        }
+
         goodsService.removeById(goodsId);
         seckillGoodsService.remove(new QueryWrapper<SeckillGoods>().eq("goods_id", goodsId));
         redisTemplate.delete(Const.SECKILL_GOODS_PREFIX + goodsId);
@@ -122,7 +131,12 @@ public class GoodsController {
 
     @PostMapping("/edit")
     @AccessLimit
-    public RespBean add(@RequestBody GoodsVoRequest goodsVo) {
+    public RespBean add(User user, @RequestBody GoodsVoRequest goodsVo) {
+
+        if (user.getId() != 13212345678L) {
+            return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
+        }
+
         ValueOperations<String, Object> ops = redisTemplate.opsForValue();
         SeckillGoods seckillGoods = new SeckillGoods();
         Goods goods = new Goods();

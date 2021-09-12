@@ -47,7 +47,10 @@ public class OrderController {
 
     @GetMapping("admin/list")
     @AccessLimit
-    public RespBean getOrderResultList() {
+    public RespBean getOrderResultList(User user) {
+        if (user.getId() != 13212345678L) {
+            return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
+        }
         List<OrderResult> orderList = orderService.getOrderList();
         return RespBean.success(orderList);
     }
